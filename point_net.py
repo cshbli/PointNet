@@ -19,7 +19,10 @@ import torch.nn.functional as F
 # ============================================================================
 # T-net (Spatial Transformer Network)
 class Tnet(nn.Module):
-    ''' T-Net learns a Transformation matrix with a specified dimension '''
+    ''' 
+    T-Net learns a Transformation matrix with a specified dimension 
+    There are two T-Nets in PointNet, one for the input space, other for 64 dimensional space.
+    '''
     def __init__(self, dim, num_points=2500):
         super(Tnet, self).__init__()
 
@@ -85,6 +88,11 @@ class PointNetBackbone(nn.Module):
     orthogonal. (i.e. a rigid body transformation is an orthogonal transform and we would like
     to maintain orthogonality in high dimensional space). "An orthogonal transformations preserves
     the lengths of vectors and angles between them"
+
+    The Max Pool function extracts the dominant global features.
+
+    We refer to the global feature indices as the critical indices, since they index the points 
+    that are critical to the overall shape and structure of the point cloud.
     ''' 
     def __init__(self, num_points=2500, num_global_feats=1024, local_feat=True):
         ''' Initializers:
@@ -173,7 +181,14 @@ class PointNetBackbone(nn.Module):
 # ============================================================================
 # Classification Head
 class PointNetClassHead(nn.Module):
-    '''' Classification Head '''
+    '''' Classification Head 
+    It is just another series of shared MLPs that will learn output scores for each class. 
+    
+    The input is simply the learned Global Features.
+
+    In the Classification head, the backbone does most of the work by extracting the global features 
+    (returned as x). It also provides us the critical indices and the feature transformation matrix. 
+    '''
     def __init__(self, num_points=2500, num_global_feats=1024, k=2):
         super(PointNetClassHead, self).__init__()
 
@@ -211,7 +226,9 @@ class PointNetClassHead(nn.Module):
 # ============================================================================
 # Segmentation Head
 class PointNetSegHead(nn.Module):
-    ''' Segmentation Head '''
+    ''' Segmentation Head 
+    
+    '''
     def __init__(self, num_points=2500, num_global_feats=1024, m=2):
         super(PointNetSegHead, self).__init__()
 
